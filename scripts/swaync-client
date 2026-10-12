@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# QuickShell replacement for swaync-client
+
+case "${1:-}" in
+    -t|--toggle-panel)
+        quickshell ipc call notifications toggle 2>/dev/null || true
+        ;;
+    -d|--toggle-dnd)
+        quickshell ipc call notifications toggleDnd 2>/dev/null || true
+        ;;
+    -c|--clear-all)
+        quickshell ipc call notifications clear 2>/dev/null || true
+        ;;
+    -rs|--reload-css)
+        exit 0
+        ;;
+    -swb|--skip-wait)
+        exit 0
+        ;;
+    *)
+        quickshell ipc call notifications toggle 2>/dev/null || true
+        ;;
+esac

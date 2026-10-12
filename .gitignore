@@ -1,0 +1,21 @@
+# Runtime and cache files
+*.log
+*.tmp
+*.bak
+*~
+.cache/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Editor configurations and temp files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Operating system files
+.DS_Store
+Thumbs.db
