@@ -45,19 +45,6 @@ PanelWindow {
         }
     }
 
-    // ==========================================
-    // BACKDROP (Dark Scrim, No Mouse Control)
-    // ==========================================
-    Rectangle {
-        id: backdrop
-        anchors.fill: parent
-        color: Qt.rgba(0.04, 0.06, 0.08, 0.60)
-        opacity: LauncherManager.launcherOpen ? 1.0 : 0.0
-
-        Behavior on opacity {
-            NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
-        }
-    }
 
     // ==========================================
     // AMBIENT GLOW BEHIND CARD
