@@ -15,6 +15,11 @@ Item {
         id: cavaProc
         command: ["cava", "-p", Quickshell.env("HOME") + "/.config/quickshell/cava.conf"]
         running: true
+        onExited: (exitCode, exitStatus) => {
+            // Jika proses cava mati tiba-tiba, reset visualizer dan restart
+            root.bars = new Array(root.barCount).fill(0)
+            restartTimer.start()
+        }
         stdout: SplitParser {
             onRead: data => {
                 let str = data.trim()
@@ -28,6 +33,25 @@ Item {
                     }
                 }
                 if (vals.length === root.barCount) root.bars = vals
+            }
+        }
+    }
+
+    Timer {
+        id: restartTimer
+        interval: 1000
+        repeat: false
+        onTriggered: cavaProc.running = true
+    }
+
+    // Watchdog: memastikan cavaProc tetap aktif jika terputus dari pipewire / audio server
+    Timer {
+        interval: 5000
+        running: true
+        repeat: true
+        onTriggered: {
+            if (!cavaProc.running) {
+                cavaProc.running = true
             }
         }
     }
