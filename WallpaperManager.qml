@@ -144,9 +144,14 @@ Item {
     function applyCurrent() {
         if (root.currentWallpaper && root.currentWallpaper.path) {
             let target = root.currentWallpaper.path
-            let prev = root.sourceWallpaper || root.originalWallpaper
+            let prev = root.previewInitialWallpaper || root.originalWallpaper || root.sourceWallpaper
             root.originalWallpaper = target
             root.closePicker()
+
+            // Restore sourceWallpaper to the initial wallpaper before picker opened so shader animates from prev to target
+            if (prev && prev !== target) {
+                root.sourceWallpaper = prev
+            }
 
             // Trigger full random dynamic transition across all screens
             root.triggerTransition(target, -1, 1200)
