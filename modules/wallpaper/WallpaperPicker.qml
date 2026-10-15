@@ -135,6 +135,9 @@ PanelWindow {
             currentIndex: WallpaperManager.currentIndex
             onCurrentIndexChanged: {
                 WallpaperManager.currentIndex = currentIndex
+                if (WallpaperManager.pickerOpen) {
+                    WallpaperManager.previewCurrent()
+                }
             }
 
             delegate: Item {
@@ -167,6 +170,18 @@ PanelWindow {
                         asynchronous: true
                         sourceSize.width: 340
                         sourceSize.height: 520
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            if (cardItem.isCurrent) {
+                                WallpaperManager.applyCurrent()
+                            } else {
+                                pathView.currentIndex = cardItem.index
+                            }
+                        }
                     }
                 }
             }

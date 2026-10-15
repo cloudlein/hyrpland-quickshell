@@ -79,8 +79,12 @@ Item {
         }
     }
 
+    property string previewInitialWallpaper: ""
+
     function openPicker() {
+        scanProc.running = true
         currentWallProc.running = true
+        root.previewInitialWallpaper = root.sourceWallpaper || root.originalWallpaper
         root.pickerOpen = true
     }
 
@@ -90,12 +94,26 @@ Item {
 
     function cancelPicker() {
         root.pickerOpen = false
+        // Revert background to original wallpaper
+        if (root.previewInitialWallpaper && root.previewInitialWallpaper.length > 0) {
+            root.sourceWallpaper = root.previewInitialWallpaper
+            root.targetWallpaper = root.previewInitialWallpaper
+            root.isTransitioning = false
+            if (root.wallpapers.length > 0) {
+                let idx = root.wallpapers.findIndex(w => w.path === root.previewInitialWallpaper)
+                if (idx !== -1) {
+                    root.currentIndex = idx
+                }
+            }
+        }
     }
 
     function next() {
         if (root.wallpapers.length > 0) {
             root.currentIndex = (root.currentIndex + 1) % root.wallpapers.length
-            if (!root.pickerOpen) {
+            if (root.pickerOpen) {
+                root.previewCurrent()
+            } else {
                 root.applyCurrent()
             }
         }
@@ -104,8 +122,21 @@ Item {
     function prev() {
         if (root.wallpapers.length > 0) {
             root.currentIndex = (root.currentIndex - 1 + root.wallpapers.length) % root.wallpapers.length
-            if (!root.pickerOpen) {
+            if (root.pickerOpen) {
+                root.previewCurrent()
+            } else {
                 root.applyCurrent()
+            }
+        }
+    }
+
+    function previewCurrent() {
+        if (root.currentWallpaper && root.currentWallpaper.path) {
+            let target = root.currentWallpaper.path
+            if (target !== root.sourceWallpaper) {
+                root.isTransitioning = false
+                root.sourceWallpaper = target
+                root.targetWallpaper = target
             }
         }
     }
@@ -138,7 +169,7 @@ Item {
     // Process to scan wallpapers
     Process {
         id: scanProc
-        command: ["sh", "-c", "find \"$HOME/wallpapers\" -maxdepth 1 -type f \\( -name \"*.png\" -o -name \"*.jpg\" -o -name \"*.jpeg\" -o -name \"*.webp\" \\) | sort"]
+        command: ["sh", "-c", "find \"$HOME/wallpapers\" -maxdepth 1 -type f \\( -iname \"*.png\" -o -iname \"*.jpg\" -o -iname \"*.jpeg\" -o -iname \"*.webp\" \\) | sort"]
         stdout: StdioCollector {
             onDataChanged: {
                 let lines = text.trim().split("\n").filter(l => l.length > 0)
