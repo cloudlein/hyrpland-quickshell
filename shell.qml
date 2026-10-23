@@ -194,7 +194,7 @@ ShellRoot {
     PanelWindow {
         id: bar
         anchors {
-            top: true
+            bottom: true
             left: true
             right: true
         }
@@ -205,12 +205,21 @@ ShellRoot {
         WlrLayershell.namespace: "quickshell-bar"
         WlrLayershell.exclusiveZone: 35
 
+        // Full-width Audio Spectrum Visualizer background (top-anchored)
+        Modules.Spectrum {
+            anchors.fill: parent
+            anchors.leftMargin: 8
+            anchors.rightMargin: 8
+            z: 0
+        }
+
         Item {
             anchors.fill: parent
             anchors.leftMargin: 8
             anchors.rightMargin: 8
             anchors.topMargin: 4
             anchors.bottomMargin: 3
+            z: 1
 
             // Left Modules
             Row {
@@ -236,7 +245,6 @@ ShellRoot {
 
                 Modules.Temperature {}
                 Modules.Prayer {}
-                Modules.Audio {}
                 Modules.Notification {}
             }
         }

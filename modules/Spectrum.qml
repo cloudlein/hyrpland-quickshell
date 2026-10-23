@@ -5,19 +5,23 @@ import ".."
 
 Item {
     id: root
-    property int barCount: 20
-    property var bars: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    property int barCount: 140
+    property var bars: []
 
-    implicitWidth: barRow.implicitWidth
-    implicitHeight: 28
+    Component.onCompleted: {
+        let arr = []
+        for (let i = 0; i < root.barCount; i++) arr.push(0)
+        root.bars = arr
+    }
 
     Process {
         id: cavaProc
         command: ["cava", "-p", Quickshell.env("HOME") + "/.config/quickshell/cava.conf"]
         running: true
         onExited: (exitCode, exitStatus) => {
-            // Jika proses cava mati tiba-tiba, reset visualizer dan restart
-            root.bars = new Array(root.barCount).fill(0)
+            let arr = []
+            for (let i = 0; i < root.barCount; i++) arr.push(0)
+            root.bars = arr
             restartTimer.start()
         }
         stdout: SplitParser {
@@ -44,7 +48,7 @@ Item {
         onTriggered: cavaProc.running = true
     }
 
-    // Watchdog: memastikan cavaProc tetap aktif jika terputus dari pipewire / audio server
+    // Watchdog
     Timer {
         interval: 5000
         running: true
@@ -58,20 +62,30 @@ Item {
 
     Row {
         id: barRow
-        anchors.centerIn: parent
-        spacing: 2
+        anchors.fill: parent
+        spacing: Math.max(1, (parent.width - (root.barCount * 4)) / Math.max(1, root.barCount - 1))
 
         Repeater {
             model: root.bars
-            Rectangle {
+            Item {
                 required property int modelData
-                width: 3
-                height: Math.max(2, Math.min(13, (modelData / 10) * 13))
-                radius: 1.5
-                color: modelData > 0 ? Theme.primary : Theme.outline_variant
-                anchors.verticalCenter: parent.verticalCenter
-                Behavior on height { NumberAnimation { duration: 35 } }
-                Behavior on color { ColorAnimation { duration: 150 } }
+                width: 4
+                height: barRow.height
+
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: 3.2
+                    // Visualizer bar lebih responsif dan tinggi
+                    height: Math.max(2.5, Math.min(barRow.height, (Math.pow(modelData / 100.0, 0.85)) * barRow.height))
+                    radius: 1.6
+                    color: modelData > 0 ? Theme.primary : Qt.rgba(Theme.outline_variant.r, Theme.outline_variant.g, Theme.outline_variant.b, 0.35)
+                    opacity: modelData > 0 ? 1.0 : 0.25
+
+                    Behavior on height { NumberAnimation { duration: 35; easing.type: Easing.OutQuad } }
+                    Behavior on color { ColorAnimation { duration: 100 } }
+                    Behavior on opacity { NumberAnimation { duration: 100 } }
+                }
             }
         }
     }

@@ -124,22 +124,6 @@ Rectangle {
             }
         }
 
-        // Module separator
-        Text {
-            height: 28
-            verticalAlignment: Text.AlignVCenter
-            text: "|"
-            font.family: Theme.fontFamily
-            font.pixelSize: 12
-            color: Theme.outline_variant
-        }
-
-        // Audio spectrum visualizer (20 frequency bands)
-        Spectrum {
-            height: 28
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
         // Divider
         Text {
             height: 28
